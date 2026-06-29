@@ -57,25 +57,46 @@ jobs:
         run: |
           git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
 
-      - name: Integrate Kowsu & SUSFS
+      # - name: Integrate Kowsu & SUSFS
+      #   run: |
+      #     cd $GITHUB_WORKSPACE/kernel_workspace
+      #
+      #     echo "=== 1. Integrating Kowsu ==="
+      #     curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/main/kernel/setup.sh" | bash -
+      #
+      #     echo "=== 2. Cloning SUSFS ==="
+      #     git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
+      #
+      #     echo "=== 3. Patching Kowsu for SUSFS ==="
+      #     cd KernelSU
+      #     patch -p1 < ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch
+      #     cd ..
+      #
+      #     echo "=== 4. Patching Kernel for SUSFS ==="
+      #     patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
+      #
+      #     echo "=== 5. Copying SUSFS Files ==="
+      #     cp -r susfs4ksu/kernel_patches/fs/* fs/
+      #     cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
+
+
+      - name: Integrate KSU-Next & SUSFS
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
           
-          echo "=== 1. Integrating Kowsu ==="
-          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/main/kernel/setup.sh" | bash -
+          echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
+          # Execute the setup script directly from pershoot's fork and specify the dev-susfs branch
+          curl -LSs "https://raw.githubusercontent.com/pershoot/KernelSU-Next/dev-susfs/kernel/setup.sh" | bash -s dev-susfs
           
           echo "=== 2. Cloning SUSFS ==="
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
           
-          echo "=== 3. Patching Kowsu for SUSFS ==="
-          cd KernelSU
-          patch -p1 < ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch
-          cd ..
+          echo "=== 3. Patching Main Kernel for SUSFS ==="
+          # Apply the core SUSFS kernel patch
+          patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch || true
           
-          echo "=== 4. Patching Kernel for SUSFS ==="
-          patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
-          
-          echo "=== 5. Copying SUSFS Files ==="
+          echo "=== 4. Copying SUSFS source files ==="
+          # Copy susfs.c and related header files directly into the kernel tree
           cp -r susfs4ksu/kernel_patches/fs/* fs/
           cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
 
