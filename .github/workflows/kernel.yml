@@ -1,0 +1,95 @@
+name: Build GKI Kernel (Sky) with Kowsu & SUSFS
+
+on:
+  workflow_dispatch:
+
+env:
+  KERNEL_SOURCE: "https://github.com/sky-lineage/android_kernel_xiaomi_sky"
+  KERNEL_BRANCH: "lineage-23.2" # Change to your target branch
+  DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
+  ARCH: "arm64"
+
+jobs:
+  build:
+    name: Build Kernel
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc curl git python3 python-is-python3 \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev libelf-dev cpio lz4 zip \
+            make wget ccache
+
+      - name: Download Toolchain
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/toolchain
+          cd $GITHUB_WORKSPACE/toolchain
+          # Using an updated AOSP Clang toolchain
+          git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-8490178.git aosp-clang
+          echo "PATH=$GITHUB_WORKSPACE/toolchain/aosp-clang/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Clone Kernel Source
+        run: |
+          git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
+
+      - name: Integrate Kowsu & SUSFS
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace
+          
+          echo "=== 1. Integrating Kowsu ==="
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/main/kernel/setup.sh" | bash -
+          
+          echo "=== 2. Cloning SUSFS ==="
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
+          
+          echo "=== 3. Patching Kowsu for SUSFS ==="
+          cd KernelSU
+          patch -p1 < ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch
+          cd ..
+          
+          echo "=== 4. Patching Kernel for SUSFS ==="
+          patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
+          
+          echo "=== 5. Copying SUSFS Files ==="
+          cp -r susfs4ksu/kernel_patches/fs/* fs/
+          cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
+
+      - name: Compile Kernel (Image)
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace
+          
+          ARGS="O=out ARCH=${{ env.ARCH }} \
+                CC=clang \
+                CROSS_COMPILE=aarch64-linux-gnu- \
+                CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+                LLVM=1 LLVM_IAS=1"
+          
+          make $ARGS ${{ env.DEFCONFIG }}
+          make -j$(nproc --all) $ARGS
+
+      - name: Package into AnyKernel3 Flashable ZIP
+        run: |
+          cd $GITHUB_WORKSPACE
+          # Clone standard AnyKernel3 template
+          git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
+          
+          # Copy your freshly compiled Image into the AnyKernel folder
+          cp kernel_workspace/out/arch/arm64/boot/Image anykernel/
+          
+          # Clean up unnecessary placeholders to match the structure you shared
+          rm -f anykernel/README.md
+          
+          # Zip everything up
+          cd anykernel
+          zip -r9 ../EndKernel-Sky-GKI-Build.zip *
+
+      - name: Upload Flashable Kernel ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: EndKernel-Sky-GKI-Zip
+          path: EndKernel-Sky-GKI-Build.zip
