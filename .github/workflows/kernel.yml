@@ -33,6 +33,28 @@ jobs:
       #     git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-8490178.git aosp-clang
       #     echo "PATH=$GITHUB_WORKSPACE/toolchain/aosp-clang/bin:$PATH" >> $GITHUB_ENV
       
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
+
+      # 1. Delete Microsoft, Android, and Java bloatware to free up ~30GB of disk space
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      # 2. Now you safely have plenty of room to allocate a massive 20GB Swap file
+      - name: Set up Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 20
+
+
       - name: Download Toolchains (Clang + GCC)
         run: |
           mkdir -p $GITHUB_WORKSPACE/toolchain/clang
