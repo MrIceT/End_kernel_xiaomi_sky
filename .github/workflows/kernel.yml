@@ -40,13 +40,13 @@ jobs:
           
           echo "=== Downloading AOSP Clang-r416183b ==="
           cd $GITHUB_WORKSPACE/toolchain/clang
-          wget -qO clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master-kernel-build-2022/clang-r416183b.tar.gz"
+          wget -qO clang.tar.gz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/clang-r416183b.tar.gz"
           tar -xf clang.tar.gz
           rm clang.tar.gz
           
           echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
           cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
-          wget -qO gcc.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+          wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
           tar -xf gcc.tar.xz --strip-components=1
           rm gcc.tar.xz
           
