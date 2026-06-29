@@ -25,14 +25,34 @@ jobs:
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev libelf-dev cpio lz4 zip \
             make wget ccache
 
-      - name: Download Toolchain
+      # - name: Download Toolchain
+      #   run: |
+      #     mkdir -p $GITHUB_WORKSPACE/toolchain
+      #     cd $GITHUB_WORKSPACE/toolchain
+      #     # Using an updated AOSP Clang toolchain
+      #     git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-8490178.git aosp-clang
+      #     echo "PATH=$GITHUB_WORKSPACE/toolchain/aosp-clang/bin:$PATH" >> $GITHUB_ENV
+      
+      - name: Download Toolchains (Clang + GCC)
         run: |
-          mkdir -p $GITHUB_WORKSPACE/toolchain
-          cd $GITHUB_WORKSPACE/toolchain
-          # Using an updated AOSP Clang toolchain
-          git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-8490178.git aosp-clang
-          echo "PATH=$GITHUB_WORKSPACE/toolchain/aosp-clang/bin:$PATH" >> $GITHUB_ENV
-
+          mkdir -p $GITHUB_WORKSPACE/toolchain/clang
+          mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+          
+          echo "=== Downloading AOSP Clang-r416183b ==="
+          cd $GITHUB_WORKSPACE/toolchain/clang
+          wget -qO clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master-kernel-build-2022/clang-r416183b.tar.gz"
+          tar -xf clang.tar.gz
+          rm clang.tar.gz
+          
+          echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
+          cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+          wget -qO gcc.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+          tar -xf gcc.tar.xz --strip-components=1
+          rm gcc.tar.xz
+          
+          echo "=== Setting PATH Variables ==="
+          echo "PATH=$GITHUB_WORKSPACE/toolchain/clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
+      
       - name: Clone Kernel Source
         run: |
           git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
@@ -65,10 +85,10 @@ jobs:
           
           ARGS="O=out ARCH=${{ env.ARCH }} \
                 CC=clang \
-                CROSS_COMPILE=aarch64-linux-gnu- \
+                CROSS_COMPILE=aarch64-none-linux-gnu- \
                 CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-                LLVM=1 LLVM_IAS=1"
-          
+                LLVM=1 LLVM_IAS=1" 
+         
           make $ARGS ${{ env.DEFCONFIG }}
           make -j$(nproc --all) $ARGS
 
