@@ -131,9 +131,12 @@ jobs:
                 CROSS_COMPILE=aarch64-none-linux-gnu- \
                 CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
                 LLVM=1 LLVM_IAS=1" 
+
+          CUSTOM_NAME="-EndsusKernel"
          
-          make $ARGS ${{ env.DEFCONFIG }}
-          make -j$(nproc --all) $ARGS
+          make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }}
+          
+          make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME Image
 
       - name: Package into AnyKernel3 Flashable ZIP
         run: |
