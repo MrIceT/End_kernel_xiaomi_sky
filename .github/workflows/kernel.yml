@@ -74,7 +74,7 @@ jobs:
           
           echo "=== Setting PATH Variables ==="
           echo "PATH=$GITHUB_WORKSPACE/toolchain/clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
-      
+
       - name: Clone Kernel Source
         run: |
           git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
