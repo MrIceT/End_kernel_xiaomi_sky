@@ -33,8 +33,8 @@ jobs:
       #     git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-8490178.git aosp-clang
       #     echo "PATH=$GITHUB_WORKSPACE/toolchain/aosp-clang/bin:$PATH" >> $GITHUB_ENV
       
-      - name: Checkout Actions Repo
-        uses: actions/checkout@v4
+      # - name: Checkout Actions Repo
+      #   uses: actions/checkout@v4
 
       # 1. Delete Microsoft, Android, and Java bloatware to free up ~30GB of disk space
       - name: Free Disk Space (Ubuntu)
