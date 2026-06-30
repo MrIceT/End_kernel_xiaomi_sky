@@ -12,7 +12,7 @@ env:
 jobs:
   build:
     name: Build Kernel
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Actions Repo
@@ -24,6 +24,13 @@ jobs:
           sudo apt-get install -y build-essential bc curl git python3 python-is-python3 \
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev libelf-dev cpio lz4 zip \
             make wget ccache
+
+
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        run: |
+          cargo install just
 
       - name: Checkout Actions Repo
         uses: actions/checkout@v4
@@ -93,9 +100,7 @@ jobs:
       #     cp -r susfs4ksu/kernel_patches/fs/* fs/
       #     cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
       
-      # - name: Setup tmate session for debugging
-      #   uses: mxschmitt/action-tmate@v3
-
+      
 
       - name: Integrate KSU-Next & SUSFS
         run: |
@@ -165,6 +170,9 @@ jobs:
           # zip -r9 ../EndKernel-${{ env.KERNEL_VER }}-Sky-GKI-Build.zip
           
           rm -rf .git README.md
+
+      - name: Setup tmate session for debugging
+        uses: mxschmitt/action-tmate@v3
 
       
       - name: Upload Flashable Kernel ZIP
