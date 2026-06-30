@@ -25,16 +25,8 @@ jobs:
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev libelf-dev cpio lz4 zip \
             make wget ccache
 
-      # - name: Download Toolchain
-      #   run: |
-      #     mkdir -p $GITHUB_WORKSPACE/toolchain
-      #     cd $GITHUB_WORKSPACE/toolchain
-      #     # Using an updated AOSP Clang toolchain
-      #     git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-8490178.git aosp-clang
-      #     echo "PATH=$GITHUB_WORKSPACE/toolchain/aosp-clang/bin:$PATH" >> $GITHUB_ENV
-      
-      # - name: Checkout Actions Repo
-      #   uses: actions/checkout@v4
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
 
       # 1. Delete Microsoft, Android, and Java bloatware to free up ~30GB of disk space
       - name: Free Disk Space (Ubuntu)
@@ -101,8 +93,8 @@ jobs:
       #     cp -r susfs4ksu/kernel_patches/fs/* fs/
       #     cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
       
-      - name: Setup tmate session for debugging
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session for debugging
+      #   uses: mxschmitt/action-tmate@v3
 
 
       - name: Integrate KSU-Next & SUSFS
