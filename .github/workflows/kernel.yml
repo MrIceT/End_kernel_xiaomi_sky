@@ -75,9 +75,9 @@ jobs:
           echo "=== Setting PATH Variables ==="
           echo "PATH=$GITHUB_WORKSPACE/toolchain/clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Clone Kernel Source
-        run: |
-          git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
+      # - name: Clone Kernel Source
+      #   run: |
+      #     git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
 
       # - name: Integrate Kowsu & SUSFS
       #   run: |
@@ -107,7 +107,7 @@ jobs:
 
       - name: Integrate KSU-Next & SUSFS
         run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace
+          # cd $GITHUB_WORKSPACE
           
           echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
           # Execute the setup script directly from pershoot's fork and specify the dev-susfs branch
@@ -127,7 +127,7 @@ jobs:
 
       - name: Compile Kernel (Image)
         run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace
+          # cd $GITHUB_WORKSPACE/kernel_workspace
           
           ARGS="O=out ARCH=${{ env.ARCH }} \
                 CC=clang \
@@ -151,7 +151,7 @@ jobs:
           cd $GITHUB_WORKSPACE/kernel_workspace
 
           # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
-          KERNEL_VER=$(make O=out ARCH=${{ env.ARCH }} kernelrelease)
+          KERNEL_VER=$(make O=out ARCH=${{ env.ARCH }} LOCALVERSION="-EndsusKernel" kernelrelease)
           echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
 
 
@@ -162,7 +162,7 @@ jobs:
           git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
           
           # Copy your freshly compiled Image into the AnyKernel folder
-          cp kernel_workspace/out/arch/arm64/boot/Image anykernel/
+          cp out/arch/arm64/boot/Image anykernel/
           
           # Clean up unnecessary placeholders to match the structure you shared
           rm -f anykernel/README.md
@@ -170,7 +170,7 @@ jobs:
           # Zip everything up
           cd anykernel
 
-          zip -r9 ../EndKernel-${{ env.KERNEL_VER }}-Sky-GKI-Build.zip
+          # zip -r9 ../EndKernel-${{ env.KERNEL_VER }}-Sky-GKI-Build.zip
           
           rm -rf .git README.md
 
@@ -178,5 +178,5 @@ jobs:
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-KSUN-SuSFS-${{ env.BUILD_DATE }} & manager
-          path: kernel_workspace/anykernel/
+          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-KSUN-SuSFS-${{ env.BUILD_DATE }}
+          path: anykernel/
