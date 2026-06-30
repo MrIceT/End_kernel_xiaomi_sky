@@ -118,7 +118,7 @@ jobs:
           # cd $GITHUB_WORKSPACE
           cd $GITHUB_WORKSPACE/kernel_workspace
           # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
-          KERNEL_VER=$(make -s O=out ARCH=${{ env.ARCH }} LOCALVERSION="-EndsusKernel" kernelrelease)
+          KERNEL_VER=$(make -s O=out ARCH=${{ env.ARCH }}  kernelrelease)
           echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
 
 
