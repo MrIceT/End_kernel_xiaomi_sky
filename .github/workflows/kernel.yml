@@ -100,6 +100,9 @@ jobs:
       #     echo "=== 5. Copying SUSFS Files ==="
       #     cp -r susfs4ksu/kernel_patches/fs/* fs/
       #     cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
+      
+          - name: Setup tmate session for debugging
+            uses: mxschmitt/action-tmate@v3
 
 
       - name: Integrate KSU-Next & SUSFS
@@ -138,6 +141,20 @@ jobs:
           
           make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME Image
 
+
+      - name: Get Build Info (Date & Version)
+        run: |
+          # 1. Generate a clean date string (e.g., 20231025-1430)
+          echo "BUILD_DATE=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+
+          # 2. Ask the kernel for its exact version string
+          cd $GITHUB_WORKSPACE/kernel_workspace
+
+          # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
+          KERNEL_VER=$(make O=out ARCH=${{ env.ARCH }} kernelrelease)
+          echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
+
+
       - name: Package into AnyKernel3 Flashable ZIP
         run: |
           cd $GITHUB_WORKSPACE
@@ -152,23 +169,14 @@ jobs:
           
           # Zip everything up
           cd anykernel
+
+          zip -r9 ../EndKernel-${{ env.KERNEL_VER }}-Sky-GKI-Build.zip
           
           rm -rf .git README.md
 
-      - name: Get Build Info (Date & Version)
-        run: |
-          # 1. Generate a clean date string (e.g., 20231025-1430)
-          echo "BUILD_DATE=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
-
-          # 2. Ask the kernel for its exact version string
-          cd $GITHUB_WORKSPACE/kernel_workspace
-
-          # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
-          KERNEL_VER=$(make O=out ARCH=${{ env.ARCH }} kernelrelease)
-          echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
-
+      
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-KSUN-SuSFS-${{ env.BUILD_DATE }}
+          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-KSUN-SuSFS-${{ env.BUILD_DATE }} & manager
           path: kernel_workspace/anykernel/
