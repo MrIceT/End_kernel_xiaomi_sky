@@ -1,4 +1,4 @@
-name: Neutron Build GKI Kernel (Sky) with KsuN(pershoot) & SUSFS
+name: Neutron Build GKI Kernel (Sky) with KsuN & SUSFS
 
 on:
   workflow_dispatch:
