@@ -100,7 +100,9 @@ jobs:
       #     cp -r susfs4ksu/kernel_patches/fs/* fs/
       #     cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
       
-      
+      - name: Setup tmate session for debugging
+        uses: mxschmitt/action-tmate@v3
+
 
       - name: Integrate KSU-Next & SUSFS
         run: |
