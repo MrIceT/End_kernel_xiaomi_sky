@@ -1,4 +1,4 @@
-name: Build GKI Kernel (Sky) with Kowsu & SUSFS
+name: Build GKI Kernel (Sky) with KsuN(pershoot) & SUSFS
 
 on:
   workflow_dispatch:
@@ -152,10 +152,23 @@ jobs:
           
           # Zip everything up
           cd anykernel
-          zip -r9 ../EndKernel-Sky-GKI-Build.zip *
+          
+          rm -rf .git README.md
+
+      - name: Get Build Info (Date & Version)
+        run: |
+          # 1. Generate a clean date string (e.g., 20231025-1430)
+          echo "BUILD_DATE=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+
+          # 2. Ask the kernel for its exact version string
+          cd $GITHUB_WORKSPACE/kernel_workspace
+
+          # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
+          KERNEL_VER=$(make O=out ARCH=${{ env.ARCH }} kernelrelease)
+          echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
 
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: EndKernel-Sky-GKI-Zip
-          path: EndKernel-Sky-GKI-Build.zip
+          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-KSUN-SuSFS-${{ env.BUILD_DATE }}
+          path: kernel_workspace/anykernel/
