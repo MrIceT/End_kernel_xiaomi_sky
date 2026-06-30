@@ -64,13 +64,14 @@ jobs:
           ./antman -S
           
           echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
-          cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
-          wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-          tar -xf gcc.tar.xz --strip-components=1
-          rm gcc.tar.xz
+          # cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+          # wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+          # tar -xf gcc.tar.xz --strip-components=1
+          # rm gcc.tar.xz
           
           echo "=== Setting PATH Variables ==="
-          echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
+          # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
+          echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$PATH" >> $GITHUB_ENV
 
 
       - name: Integrate KSU-Next & SUSFS
@@ -129,7 +130,7 @@ jobs:
           git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
           
           # Copy your freshly compiled Image into the AnyKernel folder
-          cp $GITHUB_WORKSPACE/kernel_workspaceout/arch/arm64/boot/Image anykernel/
+          cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
           
           # Clean up unnecessary placeholders to match the structure you shared
           rm -f anykernel/README.md
