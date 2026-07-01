@@ -85,16 +85,38 @@ jobs:
           echo "=== 2. Cloning SUSFS ==="
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
 
-          
+          cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU/
+          cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
+
           echo "=== 4. Copying SUSFS source files ==="
           # Copy susfs.c and related header files directly into the kernel tree
           cp -r susfs4ksu/kernel_patches/fs/* fs/
           cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
           
           echo "=== 3. Patching Main Kernel for SUSFS ==="
-          # Apply the core SUSFS kernel patch
+          # Apply the core SUSFS kernel patch 
+          cd KernelSU/
+          patch -p1 < 10_enable_susfs_for_ksu.patch 
+          cd ..
+          patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch
+
+          cat <<EOF >> arch/arm64/config/gki_defconfig
+
+          # KernelSU-Next Configuration
+          CONFIG_KSU=y
         
-          patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
+          # SUSFS Configuration
+          CONFIG_KSU_SUSFS=y
+          CONFIG_KSU_SUSFS_SUS_PATH=y
+          CONFIG_KSU_SUSFS_SUS_MOUNT=y
+          CONFIG_KSU_SUSFS_SUS_KSTAT=y
+          CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y
+          CONFIG_KSU_SUSFS_TRY_UMOUNT=y
+          CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y
+          CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSTAT=y
+          CONFIG_KSU_SUSFS_ENABLE_LOG=y
+          EOF
+          
       
 
       - name: Compile Kernel (Image)
