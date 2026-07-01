@@ -79,7 +79,7 @@ jobs:
           cd $GITHUB_WORKSPACE/kernel_workspace
           echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
           # Execute the setup script directly from pershoot's fork and specify the dev-susfs branch
-          curl -LSs "https://raw.githubusercontent.com/pershoo/KernelSU-Next/next/dev-susfs/kernel/setup.sh" | bash -s dev-susfs
+          curl -LSs "https://raw.githubusercontent.com/pershoo/KernelSU-Next/dev-susfs/kernel/setup.sh" | bash -s dev-susfs
           # curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s 
           # curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -
           
