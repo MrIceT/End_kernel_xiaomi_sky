@@ -79,20 +79,23 @@ jobs:
           cd $GITHUB_WORKSPACE/kernel_workspace
           echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
           # Execute the setup script directly from pershoot's fork and specify the dev-susfs branch
-          #curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s dev
+          #curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s 
           curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -
           
           echo "=== 2. Cloning SUSFS ==="
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
-          
-          echo "=== 3. Patching Main Kernel for SUSFS ==="
-          # Apply the core SUSFS kernel patch
-          patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch || true
+
           
           echo "=== 4. Copying SUSFS source files ==="
           # Copy susfs.c and related header files directly into the kernel tree
           cp -r susfs4ksu/kernel_patches/fs/* fs/
           cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
+          
+          echo "=== 3. Patching Main Kernel for SUSFS ==="
+          # Apply the core SUSFS kernel patch
+        
+          patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
+      
 
       - name: Compile Kernel (Image)
         run: |
