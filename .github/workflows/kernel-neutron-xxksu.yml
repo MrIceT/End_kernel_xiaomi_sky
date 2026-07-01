@@ -83,7 +83,7 @@ jobs:
           # curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -
           
           echo "=== 2. Cloning SUSFS ==="
-          git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
+          git clone --depth=10 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
           cd susfs4ksu
           git checkout d4c3914bc2e4b538d562193a65e5a11a0289d6ea
           cd ..
@@ -135,7 +135,7 @@ jobs:
 
           CUSTOM_NAME="-EndsusKernel"
          
-          make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }}
+          make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }} vendor/sky_GKI.config
           
           make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME Image
 
