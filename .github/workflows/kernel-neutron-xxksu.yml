@@ -85,7 +85,8 @@ jobs:
           echo "=== 2. Cloning SUSFS ==="
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
 
-          cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU/
+          # cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU/
+          cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU-Next/
           cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
 
           echo "=== 4. Copying SUSFS source files ==="
@@ -95,7 +96,8 @@ jobs:
           
           echo "=== 3. Patching Main Kernel for SUSFS ==="
           # Apply the core SUSFS kernel patch 
-          cd KernelSU/
+          # cd KernelSU/
+          cd KernelSU-Next
           patch -p1 < 10_enable_susfs_for_ksu.patch 
           cd ..
           patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch
