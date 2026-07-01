@@ -148,5 +148,5 @@ jobs:
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-KSUN-SuSFS-${{ env.BUILD_DATE }}
+          name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-xxksu-SuSFS-${{ env.BUILD_DATE }}
           path: anykernel/
