@@ -1,19 +1,21 @@
 name: Debug kernel
 on:
   workflow_dispatch:
+env:
+  KERNEL_SOURCE: "https://github.com/sky-lineage/android_kernel_xiaomi_sky"
+  KERNEL_BRANCH: "lineage-23.2" # Change to your target branch
+  DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
+  ARCH: "arm64"
+  steps:
+  - uses: actions/checkout@v4
+  - name: Setup tmate session
+
 jobs:
   build:
+    name: build kernel
     runs-on: ubuntu-latest
-  env:
-    KERNEL_SOURCE: "https://github.com/sky-lineage/android_kernel_xiaomi_sky"
-    KERNEL_BRANCH: "lineage-23.2" # Change to your target branch
-    DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
-    ARCH: "arm64"
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup tmate session
       
-      
+    steps:   
     - name: Setup Build Environment
       run: |
         sudo apt-get update
