@@ -6,10 +6,7 @@ env:
   KERNEL_BRANCH: "lineage-23.2" # Change to your target branch
   DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
   ARCH: "arm64"
-  steps:
-  - uses: actions/checkout@v4
-  - name: Setup tmate session
-
+  
 jobs:
   build:
     name: build kernel
@@ -70,6 +67,8 @@ jobs:
         echo "=== Setting PATH Variables ==="
         # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$PATH" >> $GITHUB_ENV
+    - uses: actions/checkout@v4
+    - name: Setup tmate session
 
       uses: mxschmitt/action-tmate@v3
       with:
