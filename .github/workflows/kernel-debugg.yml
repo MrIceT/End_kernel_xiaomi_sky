@@ -1,0 +1,112 @@
+name: Debug kernel
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  env:
+    KERNEL_SOURCE: "https://github.com/sky-lineage/android_kernel_xiaomi_sky"
+    KERNEL_BRANCH: "lineage-23.2" # Change to your target branch
+    DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
+    ARCH: "arm64"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup tmate session
+      
+      
+    - name: Setup Build Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential bc curl git python3 python-is-python3 \
+          gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev libelf-dev cpio lz4 zip \
+          make wget ccache
+
+
+    - name: Checkout Actions Repo
+      uses: actions/checkout@v4
+
+      # 1. Delete Microsoft, Android, and Java bloatware to free up ~30GB of disk space
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: false
+
+      # 2. Now you safely have plenty of room to allocate a massive 20GB Swap file
+    - name: Set up Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 20
+
+      # Clone the kernel repo
+    - name: Clone Kernel Source
+      run: |
+        git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
+
+    - name: Download Toolchains (Neutron Clang + GCC)
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/toolchain/neutron-clang
+        mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+        
+        echo "=== Downloading Neutron Clang ==="
+        cd $GITHUB_WORKSPACE/toolchain/neutron-clang
+        curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
+        chmod +x antman
+        ./antman -S
+        
+        echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
+        # cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+        # wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+        # tar -xf gcc.tar.xz --strip-components=1
+        # rm gcc.tar.xz
+        
+        echo "=== Setting PATH Variables ==="
+        # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$PATH" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v4
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
+
+
+    - name: Package into AnyKernel3 Flashable ZIP
+      run: |
+        cd $GITHUB_WORKSPACE
+        # cd $GITHUB_WORKSPACE/kernel_workspace
+        # Clone standard AnyKernel3 template
+        git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
+        
+        # Copy your freshly compiled Image into the AnyKernel folder
+        cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
+        
+        # Clean up unnecessary placeholders to match the structure you shared
+        rm -f anykernel/README.md
+        
+        # Zip everything up
+        cd anykernel
+          
+          rm -rf .git README.md
+
+    - name: Get Build Info (Date & Version)
+      run: |
+        # 1. Generate a clean date string (e.g., 20231025-1430)
+        echo "BUILD_DATE=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+
+        # 2. Ask the kernel for its exact version string
+        # cd $GITHUB_WORKSPACE
+        cd $GITHUB_WORKSPACE/kernel_workspace
+        # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
+        KERNEL_VER=$(make -s O=out ARCH=${{ env.ARCH }}  kernelrelease)
+        echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
+
+    - name: Upload Flashable Kernel ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-ksun-SuSFS-${{ env.BUILD_DATE }}
+        path: anykernel/
