@@ -1,4 +1,4 @@
-name: Neutron Build GKI Kernel (Sky) ksun with SUSFS
+name: Neutron Build Kernel with ksu and SUSFS
 
 on:
   workflow_dispatch:
@@ -49,7 +49,8 @@ jobs:
       # Clone the kernel repo
       - name: Clone Kernel Source
         run: |
-          git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
+          # git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
+          git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/android_kernel_xiaomi_sky.git
 
 
       - name: Download Toolchains (Neutron Clang + GCC)
