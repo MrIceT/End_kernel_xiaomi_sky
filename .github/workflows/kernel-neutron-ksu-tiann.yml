@@ -50,7 +50,7 @@ jobs:
       - name: Clone Kernel Source
         run: |
           # git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
-          git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/android_kernel_xiaomi_sky.git
+          git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/android_kernel_xiaomi_sky.git kernel_workspace
 
 
       - name: Download Toolchains (Neutron Clang + GCC)
