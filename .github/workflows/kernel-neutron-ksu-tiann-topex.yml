@@ -1,4 +1,4 @@
-name: Neutron Build Kernel with ksu and SUSFS
+name: TopexGuy kernel
 
 on:
   workflow_dispatch:
