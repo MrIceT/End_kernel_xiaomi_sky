@@ -94,7 +94,7 @@ jobs:
 
           #cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU/
           #cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU-Next/
-          cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch ..
+          cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
 
           echo "=== 4. Copying SUSFS source files ==="
           # Copy susfs.c and related header files directly into the kernel tree
