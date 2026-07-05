@@ -77,11 +77,12 @@ jobs:
       - name: Integrate KSU-Next & SUSFS
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
-          echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
+          echo "=== 1. Integrating KSU-Next ==="
           curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
 
       - name: Integrate Droidspaces
         run: |
+          echo "=== 1. Integrating Droidspaces ==="
           cd $GITHUB_WORKSPACE/droidspaces
           cp * $GITHUB_WORKSPACE/kernel_workspace
           cd $GITHUB_WORKSPACE/kernel_workspace
