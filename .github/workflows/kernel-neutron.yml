@@ -141,8 +141,8 @@ jobs:
       
           rm -rf .git README.md
 
-      - name: Setup tmate session for debugging
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session for debugging
+      #  uses: mxschmitt/action-tmate@v3
 
       
       - name: Upload Flashable Kernel ZIP
