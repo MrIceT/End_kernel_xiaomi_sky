@@ -120,7 +120,7 @@ jobs:
           # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
           KERNEL_VER=$(make -s O=out ARCH=${{ env.ARCH }}  kernelrelease)
           echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
-          mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
+          #mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
 
 
       # - name: Package into AnyKernel3 Flashable ZIP
