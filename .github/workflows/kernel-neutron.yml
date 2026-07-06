@@ -104,7 +104,7 @@ jobs:
                 CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
                 LLVM=1 LLVM_IAS=1" 
 
-          make $ARGS ${{ env.DEFCONFIG }}
+          make $ARGS ${{ env.DEFCONFIG }} vendor/sky_GKI.config
           
           make -j$(nproc --all) $ARGS Image
 
