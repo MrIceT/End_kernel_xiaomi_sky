@@ -56,7 +56,7 @@ jobs:
       - name: Download Toolchains (Neutron Clang + GCC)
         run: |
           mkdir -p $GITHUB_WORKSPACE/toolchain/neutron-clang
-          mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+          #mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
           
           echo "=== Downloading Neutron Clang ==="
           cd $GITHUB_WORKSPACE/toolchain/neutron-clang
