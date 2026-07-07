@@ -1,4 +1,4 @@
-name: TopexGuy kernel
+name: TopexGuy kernel Gclang
 
 on:
   workflow_dispatch:
