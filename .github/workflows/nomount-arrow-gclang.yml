@@ -74,13 +74,15 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone --depth=1 https://github.com/maxsteeel/nomount
           cp nomount/kernel/patches/nomount_5.10_kernel_integration.patch $GITHUB_WORKSPACE/kernel_workspace
+          echo "=== Patching nomunt ==="
+          cd $GITHUB_WORKSPACE/kernel_workspace
+          patch -p1 < nomount_5.10_kernel_integration.patch
+          cd $GITHUB_WORKSPACE
+
           cp nomount/kernel/src/* $GITHUB_WORKSPACE/kernel_workspace/fs
 
-          cd $GITHUB_WORKSPACE/kernel_workspace
 
-          echo "=== Patching nomunt ==="
-          patch -p1 < nomount_5.10_kernel_integration.patch
-
+          
       # - name: Integrate KSU-Next & SUSFS
       #   run: |
       #     cd $GITHUB_WORKSPACE/kernel_workspace
