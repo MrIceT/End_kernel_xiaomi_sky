@@ -65,7 +65,7 @@ jobs:
           # ./antman -S
           cd $GITHUB_WORKSPACE/toolchain/
           wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
-          tar -xvf google-clang.tar.gz --strip-components=1
+          tar -xf google-clang.tar.gz 
           rm google-clang.tar.gz
 
           # echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
@@ -78,8 +78,8 @@ jobs:
           # echo "PATH=$GITHUB_WORKSPACE/toolchain/google-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
           echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Setup tmate session for debugging
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session for debugging
+      #   uses: mxschmitt/action-tmate@v3
 
 
       # - name: Integrate KSU-Next & SUSFS
