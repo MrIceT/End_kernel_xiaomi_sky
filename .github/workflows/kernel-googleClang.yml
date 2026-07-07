@@ -123,18 +123,30 @@ jobs:
           # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
           KERNEL_VER=$(make -s O=out ARCH=${{ env.ARCH }}  kernelrelease)
           echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
-          mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
+          #mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
+
+
+      - name: Check if file exists
+        id: file_check # This ID is crucial for referencing the output later
+        run: |
+          if [ -f "path/to/your/config.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup tmate session for debugging
         uses: mxschmitt/action-tmate@v3
 
       - name: Upload only kernel
-        if: $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image
+        if: steps.file_check.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: EndsusKernel-${{ env.KERNEL_VER }}-arrow-${{ env.BUILD_DATE }}
           path: $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/
 
+          
+        if: steps.file_check.outputs.exists == 'flase'
       - name: Package into AnyKernel3 Flashable ZIP
         run: |
           cd $GITHUB_WORKSPACE
@@ -153,7 +165,7 @@ jobs:
 
           rm -rf .git README.md
 
-      
+        if: steps.file_check.outputs.exists == 'flase'
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
