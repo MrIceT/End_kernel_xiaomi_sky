@@ -108,7 +108,8 @@ jobs:
                 CROSS_COMPILE=aarch64-none-linux-gnu- \
                 CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
                 LLVM=1 LLVM_IAS=1" 
-          $CUSTOM_NAME="-nm"
+
+          CUSTOM_NAME="-nm"
 
           make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }} vendor/sky_GKI.config
           
