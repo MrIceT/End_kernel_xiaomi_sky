@@ -78,8 +78,8 @@ jobs:
           # echo "PATH=$GITHUB_WORKSPACE/toolchain/google-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
           echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
 
-      # - name: Setup tmate session for debugging
-      #   uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session for debugging
+        uses: mxschmitt/action-tmate@v3
 
 
       # - name: Integrate KSU-Next & SUSFS
