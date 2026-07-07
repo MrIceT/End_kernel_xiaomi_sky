@@ -1,4 +1,4 @@
-name: Droidspaces Arrow
+name: Droidspaces Arrow Gclang
 
 on:
   workflow_dispatch:
@@ -54,26 +54,17 @@ jobs:
           git clone --depth=1 https://github.com/MrIceT/droidspaces_oss_kernel droidspaces 
 
 
-      - name: Download Toolchains (Neutron Clang + GCC)
+      - name: Download Toolchains (Google Clang)
         run: |
-          mkdir -p $GITHUB_WORKSPACE/toolchain/neutron-clang
-          mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
-          
-          echo "=== Downloading Neutron Clang ==="
-          cd $GITHUB_WORKSPACE/toolchain/neutron-clang
-          curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
-          chmod +x antman
-          ./antman -S
-          
-          echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
-          # cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
-          # wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-          # tar -xf gcc.tar.xz --strip-components=1
-          # rm gcc.tar.xz
+          mkdir -p $GITHUB_WORKSPACE/toolchain
+          cd $GITHUB_WORKSPACE/toolchain/
+          wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
+          tar -xf google-clang.tar.gz 
+          rm google-clang.tar.gz
           
           echo "=== Setting PATH Variables ==="
           # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
-          echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$PATH" >> $GITHUB_ENV
+          echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
 
 
       - name: Integrate Droidspaces
