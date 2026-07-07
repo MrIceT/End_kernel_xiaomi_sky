@@ -76,7 +76,7 @@ jobs:
           
           echo "=== Setting PATH Variables ==="
           # echo "PATH=$GITHUB_WORKSPACE/toolchain/google-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
-          echo "PATH=$GITHUB_WORKSPACE/toolchain/google-clang/bin:$PATH" >> $GITHUB_ENV
+          echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
 
 
       # - name: Integrate KSU-Next & SUSFS
