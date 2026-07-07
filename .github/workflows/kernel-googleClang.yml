@@ -56,19 +56,19 @@ jobs:
 
       - name: Download Toolchains (Neutron Clang + GCC)
         run: |
-          mkdir -p $GITHUB_WORKSPACE/toolchain/google-clang
-          mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
+          mkdir -p $GITHUB_WORKSPACE/toolchain
+          # mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
           
           # echo "=== Downloading Neutron Clang ==="
           # curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
           # chmod +x antman
           # ./antman -S
-          cd $GITHUB_WORKSPACE/toolchain/google-clang
+          cd $GITHUB_WORKSPACE/toolchain/
           wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
-          tar -xf google-clang.tar.gz --strip-components=1
+          tar -xvf google-clang.tar.gz --strip-components=1
           rm google-clang.tar.gz
 
-          echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
+          # echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
           # cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
           # wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
           # tar -xf gcc.tar.xz --strip-components=1
@@ -77,6 +77,9 @@ jobs:
           echo "=== Setting PATH Variables ==="
           # echo "PATH=$GITHUB_WORKSPACE/toolchain/google-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
           echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
+
+      # - name: Setup tmate session for debugging
+      #   uses: mxschmitt/action-tmate@v3
 
 
       # - name: Integrate KSU-Next & SUSFS
