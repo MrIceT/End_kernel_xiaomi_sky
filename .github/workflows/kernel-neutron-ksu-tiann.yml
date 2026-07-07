@@ -56,6 +56,7 @@ jobs:
       - name: Download Toolchains (Neutron Clang + GCC)
         run: |
           mkdir -p $GITHUB_WORKSPACE/toolchain
+          cd $GITHUB_WORKSPACE/toolchain/
           wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
           tar -xf google-clang.tar.gz 
           rm google-clang.tar.gz
