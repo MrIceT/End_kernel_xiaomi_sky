@@ -1,4 +1,4 @@
-name: Neutron Build Kernel with ksu and SUSFS
+name: GClang ksun and SUSFS
 
 on:
   workflow_dispatch:
@@ -53,7 +53,7 @@ jobs:
           git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/android_kernel_xiaomi_sky.git kernel_workspace
 
 
-      - name: Download Toolchains (Neutron Clang + GCC)
+      - name: Download Toolchains (GClang)
         run: |
           mkdir -p $GITHUB_WORKSPACE/toolchain
           cd $GITHUB_WORKSPACE/toolchain/
@@ -64,8 +64,7 @@ jobs:
           echo "=== Setting PATH Variables ==="
           # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
           echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
-
-
+      
       - name: Integrate KSU-Next & SUSFS
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
