@@ -128,6 +128,20 @@ jobs:
           echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
           #mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
 
+      - name: Package into AnyKernel3 Flashable ZIP
+        run: |
+          cd $GITHUB_WORKSPACE
+          # cd $GITHUB_WORKSPACE/kernel_workspace
+          # Clone standard AnyKernel3 template
+          git clone --depth=1 https://github.com/MrIceT/anykernel3_wild.git anykernel
+          
+          # Copy your freshly compiled Image into the AnyKernel folder
+          cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
+          
+          # Zip everything up
+          cd anykernel
+          
+          rm -rf .git
 
       # - name: Setup tmate session for debugging
       #   uses: mxschmitt/action-tmate@v3
@@ -136,4 +150,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: EndsusKernel-${{ env.KERNEL_VER }}-arrow-${{ env.BUILD_DATE }}
-          path: kernel_workspace/out/arch/arm64/boot/
+          path: anykernel/
