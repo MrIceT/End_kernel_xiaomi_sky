@@ -1,4 +1,4 @@
-name: nmount arrow gclang
+name: GClang ksun, SUSFS and nomount arrow
 
 on:
   workflow_dispatch:
@@ -50,24 +50,71 @@ jobs:
       - name: Clone Kernel Source
         run: |
           # git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
-
           git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/android_kernel_xiaomi_sky.git kernel_workspace
 
 
-      - name: Download Toolchains (Neutron Clang + GCC)
+      - name: Download Toolchains (GClang)
         run: |
           mkdir -p $GITHUB_WORKSPACE/toolchain
-
-          echo "=== Downloading gclang 21 ==="
           cd $GITHUB_WORKSPACE/toolchain/
           wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
           tar -xf google-clang.tar.gz 
           rm google-clang.tar.gz
           
           echo "=== Setting PATH Variables ==="
+          # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
           echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
+      
+      - name: Integrate KSU-Next & SUSFS
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace
+          echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
+          # Execute the setup script directly from pershoot's fork and specify the dev-susfs branch
+          curl -LSs "https://raw.githubusercontent.com/pershoot/KernelSU-Next/dev-susfs/kernel/setup.sh" | bash -s dev-susfs
+          # curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s 
+          # curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -
+          
+          #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
+          
+          echo "=== 2. Cloning SUSFS ==="
+          git clone --depth=10 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
+          cd susfs4ksu
+          git checkout d4c3914bc2e4b538d562193a65e5a11a0289d6ea
+          cd ..
 
+          #cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU/
+          #cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU-Next/
+          cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
 
+          echo "=== 4. Copying SUSFS source files ==="
+          # Copy susfs.c and related header files directly into the kernel tree
+          cp -r susfs4ksu/kernel_patches/fs/* fs/
+          cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
+          
+          echo "=== 3. Patching Main Kernel for SUSFS ==="
+          # Apply the core SUSFS kernel patch 
+          #cd KernelSU/
+          #cd KernelSU-Next
+          #patch -p1 < 10_enable_susfs_for_ksu.patch 
+          #cd ..
+          patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch
+
+          #cat <<EOF >> arch/arm64/configs/gki_defconfig
+
+          # KernelSU-Next Configuration
+          #CONFIG_KSU=y
+        
+          # SUSFS Configuration
+          #CONFIG_KSU_SUSFS=y
+          #CONFIG_KSU_SUSFS_SUS_PATH=y
+          #CONFIG_KSU_SUSFS_SUS_MOUNT=y
+          #CONFIG_KSU_SUSFS_SUS_KSTAT=y
+          #CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y
+          #CONFIG_KSU_SUSFS_TRY_UMOUNT=y
+          #CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y
+          #CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSTAT=y
+          #CONFIG_KSU_SUSFS_ENABLE_LOG=y
+          #EOF
       - name: Integrate nomount
         run: |
           echo "=== Cloning nomunt ==="
@@ -79,25 +126,7 @@ jobs:
           cd $GITHUB_WORKSPACE/kernel_workspace
           patch -p1 < nomount_5.10_kernel_integration.patch
 
-
-
-          
-      # - name: Integrate KSU-Next & SUSFS
-      #   run: |
-      #     cd $GITHUB_WORKSPACE/kernel_workspace
-      #     echo "=== 1. Integrating KSU-Next (pershoot dev-susfs) ==="
-      #     # Execute the setup script directly from pershoot's fork and specify the dev-susfs branch
-      #     curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s dev
-      #
-      #     echo "=== 4. Copying SUSFS source files ==="
-      #     # Copy susfs.c and related header files directly into the kernel tree
-      #     cp -r susfs4ksu/kernel_patches/fs/* fs/
-      #     cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
-      #
-      #     echo "=== 3. Patching Main Kernel for SUSFS ==="
-      #     # Apply the core SUSFS kernel patch
-      #     patch -p1 < susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch
-
+      
 
       - name: Compile Kernel (Image)
         run: |
@@ -108,8 +137,8 @@ jobs:
                 CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
                 LLVM=1 LLVM_IAS=1" 
 
-          CUSTOM_NAME="-nm"
-
+          CUSTOM_NAME="-EndsusKernel"
+         
           make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }} vendor/sky_GKI.config
           
           make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME Image
@@ -126,7 +155,6 @@ jobs:
           # (Make sure the LOCALVERSION matches whatever you used in the compile step!)
           KERNEL_VER=$(make -s O=out ARCH=${{ env.ARCH }}  kernelrelease)
           echo "KERNEL_VER=$KERNEL_VER" >> $GITHUB_ENV
-          #mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
 
 
       - name: Package into AnyKernel3 Flashable ZIP
@@ -145,11 +173,11 @@ jobs:
           rm -rf .git
 
       #- name: Setup tmate session for debugging
-      #  uses: mxschmitt/action-tmate@v3
+       # uses: mxschmitt/action-tmate@v3
 
       
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: EndsusKernel-${{ env.KERNEL_VER }}-nomount-arrow-${{ env.BUILD_DATE }}
+          name: EndsusKernel-${{ env.KERNEL_VER }}-arrow-ksuN-SuSFS-${{ env.BUILD_DATE }}
           path: anykernel/
