@@ -162,21 +162,17 @@ jobs:
       - name: Package into AnyKernel3 Flashable ZIP
         run: |
           cd $GITHUB_WORKSPACE
+          # cd $GITHUB_WORKSPACE/kernel_workspace
           # Clone standard AnyKernel3 template
-          git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
+          git clone --depth=1 https://github.com/MrIceT/anykernel3_wild.git anykernel
           
           # Copy your freshly compiled Image into the AnyKernel folder
-          cp out/arch/arm64/boot/Image anykernel/
-          
-          # Clean up unnecessary placeholders to match the structure you shared
-          rm -f anykernel/README.md
+          cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
           
           # Zip everything up
           cd anykernel
-
-          # zip -r9 ../EndKernel-${{ env.KERNEL_VER }}-Sky-GKI-Build.zip
           
-          rm -rf .git README.md
+          rm -rf .git
 
       - name: Setup tmate session for debugging
         uses: mxschmitt/action-tmate@v3
