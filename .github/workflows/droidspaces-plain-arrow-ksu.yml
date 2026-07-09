@@ -125,18 +125,15 @@ jobs:
           cd $GITHUB_WORKSPACE
           # cd $GITHUB_WORKSPACE/kernel_workspace
           # Clone standard AnyKernel3 template
-          git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
+          git clone --depth=1 https://github.com/MrIceT/anykernel3_wild.git anykernel
           
           # Copy your freshly compiled Image into the AnyKernel folder
           cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
           
-          # Clean up unnecessary placeholders to match the structure you shared
-          rm -f anykernel/README.md
-          
           # Zip everything up
           cd anykernel
           
-          rm -rf .git README.md
+          rm -rf .git
 
       #- name: Setup tmate session for debugging
        # uses: mxschmitt/action-tmate@v3
@@ -145,5 +142,5 @@ jobs:
       - name: Upload Flashable Kernel ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: End-DroidSS${{ env.KERNEL_VER }}-arrow-ksun${{ env.BUILD_DATE }}
+          name: End-DroidSS-${{ env.KERNEL_VER }}-arrow-ksun-${{ env.BUILD_DATE }}
           path: anykernel/
