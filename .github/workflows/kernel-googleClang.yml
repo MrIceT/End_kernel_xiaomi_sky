@@ -129,20 +129,10 @@ jobs:
           #mv $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/kernel
 
 
-      - name: Check if file exists
-        id: file_check # This ID is crucial for referencing the output later
-        run: |
-          if [ -f "$GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
       # - name: Setup tmate session for debugging
       #   uses: mxschmitt/action-tmate@v3
 
       - name: Upload only kernel
-        if: steps.file_check.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: EndsusKernel-${{ env.KERNEL_VER }}-arrow-${{ env.BUILD_DATE }}
