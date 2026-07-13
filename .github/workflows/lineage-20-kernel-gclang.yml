@@ -1,4 +1,4 @@
-name: Google-clang-21 normal arrow
+name: lineage-20 kernel
 
 on:
   workflow_dispatch:
