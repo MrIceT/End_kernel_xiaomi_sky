@@ -2,7 +2,7 @@ name: Debug kernel lineage-20
 on:
   workflow_dispatch:
 env:
-  KERNEL_SOURCE: "https://github.com/lostark13/kernel_xiaomi_sky"
+  KERNEL_SOURCE: "https://github.com/MrIceT/kernel_xiaomi_sky_base"
   KERNEL_BRANCH: "lineage-20.0" # Change to your target branch
   DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
   ARCH: "arm64"
