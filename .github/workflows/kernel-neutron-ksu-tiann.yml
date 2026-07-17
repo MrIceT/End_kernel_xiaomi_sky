@@ -131,7 +131,7 @@ jobs:
          
           make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }} vendor/sky_GKI.config
           
-          make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME Image
+          make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME
 
 
       - name: Get Build Info (Date & Version)
