@@ -86,7 +86,7 @@ jobs:
         
         make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }} vendor/sky_GKI.config
         
-        make -j$(nproc --all)
+        make -j$(nproc --all) $ARGS LOCALVERSION=$CUSTOM_NAME
     # - name: Package into AnyKernel3 Flashable ZIP
     #   run: |
     #     cd $GITHUB_WORKSPACE
