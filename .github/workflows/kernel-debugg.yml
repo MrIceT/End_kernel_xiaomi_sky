@@ -1,9 +1,9 @@
-name: Debug kernel
+name: Debug kernel lineage-20
 on:
   workflow_dispatch:
 env:
-  KERNEL_SOURCE: "https://github.com/sky-lineage/android_kernel_xiaomi_sky"
-  KERNEL_BRANCH: "lineage-23.2" # Change to your target branch
+  KERNEL_SOURCE: "https://github.com/lostark13/kernel_xiaomi_sky"
+  KERNEL_BRANCH: "lineage-20.0" # Change to your target branch
   DEFCONFIG: "gki_defconfig"   # Pure GKI builds usually use gki_defconfig
   ARCH: "arm64"
   
@@ -67,31 +67,43 @@ jobs:
         echo "=== Setting PATH Variables ==="
         # echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=$GITHUB_WORKSPACE/toolchain/neutron-clang/bin:$PATH" >> $GITHUB_ENV
-    - uses: actions/checkout@v4
-    - name: Setup tmate session
+    # - uses: actions/checkout@v4
+    # - name: Setup tmate session
 
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true
-
-
-    - name: Package into AnyKernel3 Flashable ZIP
+      # uses: mxschmitt/action-tmate@v3
+      # with:
+      #   limit-access-to-actor: true
+    - name: Compile Kernel (Image)
       run: |
-        cd $GITHUB_WORKSPACE
-        # cd $GITHUB_WORKSPACE/kernel_workspace
-        # Clone standard AnyKernel3 template
-        git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
+        cd $GITHUB_WORKSPACE/kernel_workspace
+        ARGS="O=out ARCH=${{ env.ARCH }} \
+              CC=clang \
+              CROSS_COMPILE=aarch64-none-linux-gnu- \
+              CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+              LLVM=1 LLVM_IAS=1" 
+
+        CUSTOM_NAME="-EndsusKernel"
         
-        # Copy your freshly compiled Image into the AnyKernel folder
-        cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
+        make $ARGS LOCALVERSION=$CUSTOM_NAME ${{ env.DEFCONFIG }} vendor/sky_GKI.config
         
-        # Clean up unnecessary placeholders to match the structure you shared
-        rm -f anykernel/README.md
-        
-        # Zip everything up
-        cd anykernel
-          
-          rm -rf .git README.md
+        make -j$(nproc --all)
+    # - name: Package into AnyKernel3 Flashable ZIP
+    #   run: |
+    #     cd $GITHUB_WORKSPACE
+    #     # cd $GITHUB_WORKSPACE/kernel_workspace
+    #     # Clone standard AnyKernel3 template
+    #     git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git anykernel
+    #
+    #     # Copy your freshly compiled Image into the AnyKernel folder
+    #     cp $GITHUB_WORKSPACE/kernel_workspace/out/arch/arm64/boot/Image anykernel/
+    #
+    #     # Clean up unnecessary placeholders to match the structure you shared
+    #     rm -f anykernel/README.md
+    #
+    #     # Zip everything up
+    #     cd anykernel
+    #
+    #       rm -rf .git README.md
 
     - name: Get Build Info (Date & Version)
       run: |
@@ -109,4 +121,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: EndsusKernel-${{ env.KERNEL_VER }}-Sky-ksun-SuSFS-${{ env.BUILD_DATE }}
-        path: anykernel/
+        path: kernel_workspace/out/arch/arm64/boot/
