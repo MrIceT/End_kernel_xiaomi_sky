@@ -26,6 +26,8 @@ env:
   LLVM: 1
   LLVM_IAS: 1
 
+  #TODO: add swap and freeup space
+
 jobs:
   build:
     name: Build Kernel
