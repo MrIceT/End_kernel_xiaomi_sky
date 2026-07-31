@@ -1,0 +1,119 @@
+name: Build SM6225 Kernel with KernelSU
+
+on:
+  workflow_dispatch:
+    inputs:
+      defconfig:
+        description: 'Kernel Defconfig (e.g., vendor/hawao_defconfig)'
+        required: true
+        #        TODO: fingure out all the needed Defconfig
+        default: 'vendor/hawao_defconfig'
+      kernelsu_branch:
+        description: 'KernelSU Branch'
+        required: true
+        #        TODO: find wether it is main or master
+        default: 'main'
+
+env:
+  KERNEL_REPO: https://github.com/Evolution-X-Devices/kernel_motorola_sm6225
+  KERNEL_BRANCH: vic # Adjust this if the kernel branch is different
+  # TODO: find clang 19 url
+  CLANG_URL: https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r522817.tar.gz # Replace with exact Clang 19.0.1 tarball if different
+  KSU_REPO: https://raw.githubusercontent.com/backslashxx/KernelSU
+  ARCH: arm64
+  SUBARCH: arm64
+  CC: clang
+  LLVM: 1
+  LLVM_IAS: 1
+
+jobs:
+  build:
+    name: Build Kernel
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Workspace
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev \
+            curl wget git zip unzip make gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            cpio python3 python3-pip lld binutils-aarch64-linux-gnu \
+            binutils-arm-linux-gnueabi
+            
+      - name: Clone Kernel Source
+        run: |
+          git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel_workspace
+          
+      - name: Download and Setup Android Clang 19.0.1
+        run: |
+          mkdir -p clang
+          cd clang
+          # Downloading AOSP Clang. 
+          # Note: If this specific clang version fails to download, you can replace the URL with ZyC-Clang or Neutron Clang
+          #TODO: add clang to bin
+          wget -O clang.tar.gz ${{ env.CLANG_URL }}
+          tar -xzf clang.tar.gz
+          cd ..
+          
+      - name: Setup KernelSU
+        run: |
+          cd kernel_workspace
+          curl -LSs "${{ env.KSU_REPO }}/${{ github.event.inputs.kernelsu_branch }}/kernel/setup.sh" | bash -
+          
+      - name: Build Kernel
+        run: |
+          cd kernel_workspace
+          
+          # Set paths for the toolchain
+          # TODO: should check with endkernel-sky
+          export PATH="$(pwd)/../clang/bin:$PATH"
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          export CROSS_COMPILE_COMPAT=arm-linux-gnueabi-
+          
+          # Clean build environment
+          make O=out ARCH=${{ env.ARCH }} clean
+          make O=out ARCH=${{ env.ARCH }} mrproper
+          
+          # Make Defconfig
+          make O=out ARCH=${{ env.ARCH }} \
+               CC=${{ env.CC }} \
+               LLVM=${{ env.LLVM }} \
+               LLVM_IAS=${{ env.LLVM_IAS }} \
+               ${{ github.event.inputs.defconfig }}
+               
+          # Compile
+          make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} \
+               CC=${{ env.CC }} \
+               LLVM=${{ env.LLVM }} \
+               LLVM_IAS=${{ env.LLVM_IAS }} \
+               CROSS_COMPILE=${CROSS_COMPILE} \
+               CROSS_COMPILE_COMPAT=${CROSS_COMPILE_COMPAT}
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p artifacts
+          cd kernel_workspace
+          
+          # GKI-1 kernels typically use Image or Image.gz
+          if [ -f "out/arch/arm64/boot/Image" ]; then
+            cp out/arch/arm64/boot/Image ../artifacts/
+          fi
+          
+          if [ -f "out/arch/arm64/boot/Image.gz" ]; then
+            cp out/arch/arm64/boot/Image.gz ../artifacts/
+          fi
+
+          if [ -f "out/arch/arm64/boot/dtbo.img" ]; then
+            cp out/arch/arm64/boot/dtbo.img ../artifacts/
+          fi
+
+#TODO: add anykernel setup
+      - name: Upload Kernel Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SM6225-Kernel-KSU
+          path: artifacts/*
+          compression-level: 9
