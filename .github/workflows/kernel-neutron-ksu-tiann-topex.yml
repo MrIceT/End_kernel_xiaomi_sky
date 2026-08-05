@@ -77,7 +77,7 @@ jobs:
           # #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
           
           # echo "=== 2. Cloning SUSFS ==="
-           git clone --depth=10 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
+           git clone --depth=15 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
            cd susfs4ksu
            git checkout d4c3914bc2e4b538d562193a65e5a11a0289d6ea
            cd ..
