@@ -50,8 +50,8 @@ jobs:
       - name: Clone Kernel Source
         run: |
           # git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
-          git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/kernel_xiaomi_sky.git kernel_workspace
-
+          #git clone --depth=1 -b lineage-23.2 https://github.com/MrIceT/kernel_xiaomi_sky.git kernel_workspace
+           git clone --depth=1 -b 17 https://github.com/TopexGuy/kernel_xiaomi_sky kernel_workspace
 
       - name: Download Toolchains (Gclang)
         run: |
@@ -77,27 +77,27 @@ jobs:
           # #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
           
           # echo "=== 2. Cloning SUSFS ==="
-          # git clone --depth=10 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
-          # cd susfs4ksu
-          # git checkout d4c3914bc2e4b538d562193a65e5a11a0289d6ea
-          # cd ..
+           git clone --depth=10 https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 susfs4ksu
+           cd susfs4ksu
+           git checkout d4c3914bc2e4b538d562193a65e5a11a0289d6ea
+           cd ..
 
           # #cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU/
           # #cp susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch KernelSU-Next/
-          # cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
+           cp susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch .
 
           # echo "=== 4. Copying SUSFS source files ==="
           # # Copy susfs.c and related header files directly into the kernel tree
-          # cp -r susfs4ksu/kernel_patches/fs/* fs/
-          # cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
+           cp -r susfs4ksu/kernel_patches/fs/* fs/
+           cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
           
           # echo "=== 3. Patching Main Kernel for SUSFS ==="
           # # Apply the core SUSFS kernel patch 
           # #cd KernelSU/
-          # #cd KernelSU-Next
-          # #patch -p1 < 10_enable_susfs_for_ksu.patch 
-          # #cd ..
-          # patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch
+          ## cd KernelSU-Next
+           #patch -p1 < 10_enable_susfs_for_ksu.patch 
+           #cd ..
+           patch -p1 < 50_add_susfs_in_gki-android12-5.10.patch
 
           # #cat <<EOF >> arch/arm64/configs/gki_defconfig
 
