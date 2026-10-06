@@ -102,7 +102,7 @@ jobs:
           cp -r susfs4ksu/kernel_patches/fs/* fs/
           cp -r susfs4ksu/kernel_patches/include/linux/* include/linux/
 
-        cat <<EOF >> arch/arm64/configs/vendor/sky_GKI.config 
+          cat <<EOF >> arch/arm64/configs/vendor/sky_GKI.config 
 
 
           # KernelSU
@@ -156,7 +156,8 @@ jobs:
           CONFIG_KSU_SUSFS_SUS_MAP=y
           # end of KernelSU - SUSFS
           # end of KernelSU
-        EOF
+          
+          EOF
 
       - name: Compile Kernel (Image)
         run: |
