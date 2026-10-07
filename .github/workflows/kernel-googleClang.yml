@@ -25,8 +25,9 @@ jobs:
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev libelf-dev cpio lz4 zip \
             make wget ccache binutils-aarch64-linux-gnu libc6-dev-arm64-cross linux-libc-dev-arm64-cross
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      - name: Open SSH session
+        run: |
+          curl -sSf https://sshx.io/get | sh -s run
 
       - name: Checkout Actions Repo
         uses: actions/checkout@v4
