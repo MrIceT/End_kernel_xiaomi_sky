@@ -64,9 +64,9 @@ jobs:
           echo "=== Setting PATH Variables ==="
           echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Open SSH session
-        run: |
-          curl -sSf https://sshx.io/get | sh -s run
+      # - name: Open SSH session
+      #   run: |
+      #     curl -sSf https://sshx.io/get | sh -s run
 
 
       - name: Integrate bakasu & SUSFS
@@ -149,15 +149,29 @@ jobs:
       - name: Compile Kernel (Image)
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
-          ARGS="O=out ARCH=${{ env.ARCH }} \
-                CC=clang \
-                CROSS_COMPILE=aarch64-none-linux-gnu- \
-                CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-                LLVM=1 LLVM_IAS=1" 
 
-          make $ARGS ${{ env.DEFCONFIG }} vendor/sky_GKI.config
-          
-          make -j$(nproc --all) $ARGS Image
+          make O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
+          CLANG_FLAGS="$CLANG_FLAGS" \
+          gki_defconfig
+
+          scripts/kconfig/merge_config.sh -m -r -y -O out \
+            out/.config \
+            arch/arm64/configs/vendor/parrot_GKI.config \
+            arch/arm64/configs/vendor/sky_GKI.config
+
+          make O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
+          CLANG_FLAGS="$CLANG_FLAGS" \
+          olddefconfig
+
+          make -j$(nproc --all) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
+          CLANG_FLAGS="$CLANG_FLAGS" \
+          Image
 
 
       - name: Get Build Info (Date & Version)
