@@ -31,16 +31,16 @@ jobs:
         uses: actions/checkout@v4
 
       # 1. Delete Microsoft, Android, and Java bloatware to free up ~30GB of disk space
-      # - name: Free Disk Space (Ubuntu)
-      #   uses: jlumbroso/free-disk-space@main
-      #   with:
-      #     tool-cache: true
-      #     android: true
-      #     dotnet: true
-      #     haskell: true
-      #     large-packages: true
-      #     docker-images: true
-      #     swap-storage: false
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
 
       # 2. Now you safely have plenty of room to allocate a massive 20GB Swap file
       - name: Set up Swap Space
