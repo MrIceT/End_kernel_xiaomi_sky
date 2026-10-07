@@ -29,16 +29,16 @@ jobs:
         uses: actions/checkout@v4
 
       # 1. Delete Microsoft, Android, and Java bloatware to free up ~30GB of disk space
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false
+      # - name: Free Disk Space (Ubuntu)
+      #   uses: jlumbroso/free-disk-space@main
+      #   with:
+      #     tool-cache: true
+      #     android: true
+      #     dotnet: true
+      #     haskell: true
+      #     large-packages: true
+      #     docker-images: true
+      #     swap-storage: false
 
       # 2. Now you safely have plenty of room to allocate a massive 20GB Swap file
       - name: Set up Swap Space
@@ -49,37 +49,27 @@ jobs:
       # Clone the kernel repo
       - name: Clone Kernel Source
         run: |
-          # git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_SOURCE }} kernel_workspace
-
-          git clone --depth=1 -b lineage-23.2 https://github.com/sky-lineage/android_kernel_xiaomi_sky.git kernel_workspace
+          # git clone --depth=1 -b lineage-23.2 https://github.com/sky-lineage/android_kernel_xiaomi_sky.git kernel_workspace
 
 
-      - name: Download Toolchains (Google Clang + GCC)
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/toolchain
-          # mkdir -p $GITHUB_WORKSPACE/toolchain/gcc-aarch64
-          
-          # echo "=== Downloading Neutron Clang ==="
-          # curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
-          # chmod +x antman
-          # ./antman -S
-          cd $GITHUB_WORKSPACE/toolchain/
-          wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
-          tar -xf google-clang.tar.gz 
-          rm google-clang.tar.gz
-
-          # echo "=== Downloading ARM GNU GCC 14.2.rel1 ==="
-          # cd $GITHUB_WORKSPACE/toolchain/gcc-aarch64
-          # wget -qO gcc.tar.xz "https://github.com/ravindu644/Android-Kernel-Tutorials/releases/download/toolchains/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-          # tar -xf gcc.tar.xz --strip-components=1
-          # rm gcc.tar.xz
-          
-          echo "=== Setting PATH Variables ==="
-          # echo "PATH=$GITHUB_WORKSPACE/toolchain/google-clang/bin:$GITHUB_WORKSPACE/toolchain/gcc-aarch64/bin:$PATH" >> $GITHUB_ENV
-          echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
+      # - name: Download Toolchains (Google Clang + GCC)
+      #   run: |
+      #     mkdir -p $GITHUB_WORKSPACE/toolchain
+      #
+      #     cd $GITHUB_WORKSPACE/toolchain/
+      #     wget -qO google-clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/f8439f0628d799092dd07df440a6334cab28939c/clang-r563880c.tar.gz"
+      #     tar -xf google-clang.tar.gz 
+      #     rm google-clang.tar.gz
+      #
+      #     echo "=== Setting PATH Variables ==="
+      #     echo "PATH=$GITHUB_WORKSPACE/toolchain/bin:$PATH" >> $GITHUB_ENV
 
       - name: Setup tmate session for debugging
         uses: mxschmitt/action-tmate@v3
+        with:
+          detached: false
+          limit-access-to-actor: true
+          connect-timeout-seconds: 600:wget
 
 
       - name: Integrate bakasu & SUSFS
