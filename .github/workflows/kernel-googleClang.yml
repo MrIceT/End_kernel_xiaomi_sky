@@ -150,6 +150,15 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
 
+          GCC_LIB=$(dirname "$(aarch64-linux-gnu-gcc -print-libgcc-file-name)")
+          SYSROOT=$(aarch64-linux-gnu-gcc -print-sysroot)
+
+          echo "$GCC_LIB"
+          echo "$SYSROOT"
+
+          export CLANG_FLAGS="--target=aarch64-linux-gnu --sysroot=$SYSROOT --gcc-install-dir=$GCC_LIB -fintegrated-as -Werror=unknown-warning-option"
+
+
           make O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 \
           CROSS_COMPILE=aarch64-linux-gnu- \
           CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
